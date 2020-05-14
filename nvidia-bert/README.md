@@ -31,6 +31,14 @@ bash scripts/docker/launch.sh
 bash data/create_datasets_from_start.sh 
 ```
 
+If you have trouble with the download, you can try downloading wiki corpus only.
+```
+cd workspace
+bash scripts/docker/build.sh
+bash scripts/docker/launch.sh
+bash data/create_wiki_corpus_from_start.sh.sh 
+```
+
 ## For local run, proceed as ..
 
 Step 4. Set correct paths to training data for docker image.
