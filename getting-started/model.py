@@ -26,7 +26,6 @@ class TransformerModel(nn.Module):
     def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
         super(TransformerModel, self).__init__()
         self.model_type = 'Transformer'
-        self.src_mask = None
         self.pos_encoder = PositionalEncoding(ninp, dropout)
         encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
@@ -36,7 +35,7 @@ class TransformerModel(nn.Module):
 
         self.init_weights()
 
-    def _generate_square_subsequent_mask(self, src):
+    def generate_square_subsequent_mask(self, src):
         sz = src.size(0)
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
@@ -49,11 +48,6 @@ class TransformerModel(nn.Module):
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, src):
-        if self.src_mask == None or self.src_mask.size(0) != src.size(0):
-            device = src.device
-            mask = self._generate_square_subsequent_mask(src).to(device)
-            self.src_mask = mask
-
         src = self.encoder(src) * math.sqrt(self.ninp)
         src = self.pos_encoder(src)
         output = self.transformer_encoder(src, self.src_mask)
