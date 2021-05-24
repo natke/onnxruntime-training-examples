@@ -2,21 +2,27 @@ import time
 import math
 import torch
 import torch.nn as nn
-import torchtext
 from model import TransformerModel
-from torchtext.data.utils import get_tokenizer
 
-from onnxruntime.training import ORTModule
+
+import torchtext
+from torchtext.legacy import data
+from torchtext.legacy import datasets
+from torchtext.legacy.data import get_tokenizer
+
+from torch_ort import ORTModule
 
 basic_english_tokenizer=get_tokenizer("basic_english")
 
-TEXT = torchtext.data.Field(tokenize=basic_english_tokenizer,
-                            init_token='<sos>',
-                            eos_token='<eos>',
-                            lower=True)
 
-train_txt, val_txt, test_txt = torchtext.datasets.WikiText2.splits(TEXT)
+TEXT = data.Field(tokenize=basic_english_tokenizer,
+                  init_token='<sos>',
+                  eos_token='<eos>',
+                  lower=True)
+
+train_txt, val_txt, test_txt = datasets.WikiText2.splits(TEXT)
 TEXT.build_vocab(train_txt)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 bptt = 35
